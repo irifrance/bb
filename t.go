@@ -37,7 +37,21 @@ func (b *T) Rewind() {
 	b.i = 0
 }
 
-func (b *T) WriteLen(v uint64, n int) {
+func (b *T) Write32(v uint32, n int) {
+	if n > 32 {
+		panic("32")
+	}
+	b.Write64(uint64(v), n)
+}
+
+func (b *T) Write16(v uint16, n int) {
+	if n > 16 {
+		panic("16")
+	}
+	b.Write64(uint64(v), n)
+}
+
+func (b *T) Write64(v uint64, n int) {
 	if n > 64 {
 		panic("64")
 	}
@@ -61,7 +75,21 @@ func (b *T) WriteLen(v uint64, n int) {
 	}
 }
 
-func (b *T) ReadLen(n int) uint64 {
+func (b *T) Read32(n int) uint32 {
+	if n > 32 {
+		panic("32")
+	}
+	return uint32(b.Read64(n))
+}
+
+func (b *T) Read16(n int) uint16 {
+	if n > 16 {
+		panic("16")
+	}
+	return uint16(b.Read64(n))
+}
+
+func (b *T) Read64(n int) uint64 {
 	if n > 64 {
 		panic("64")
 	}

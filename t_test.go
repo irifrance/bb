@@ -15,11 +15,11 @@ func TestBBLen(t *testing.T) {
 		shifts[i] = s
 		n := uint64(rand.Intn(1 << uint(s)))
 		d[i] = n
-		b.WriteLen(n, s)
+		b.Write64(n, s)
 	}
 	c := FromSlice(b.D)
 	for i := 0; i < N; i++ {
-		v := c.ReadLen(shifts[i])
+		v := c.Read64(shifts[i])
 		if v != d[i] {
 			t.Errorf("%d != %d\n", v, d[i])
 		}
