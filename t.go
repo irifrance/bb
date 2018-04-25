@@ -1,16 +1,24 @@
 package bb
 
 type T struct {
-	D []byte
+	d []byte
 	i uint
 }
 
 func FromSlice(d []byte) *T {
-	return &T{D: d}
+	return &T{d: d}
 }
 
 func New(sz int) *T {
-	return &T{D: make([]byte, sz)}
+	return &T{d: make([]byte, sz)}
+}
+
+func (b *T) Bytes() []byte {
+	j, o := b.i/8, b.i%8
+	if o != 0 {
+		j++
+	}
+	return b.d[:j]
 }
 
 // Bump if bit index is not aligned to next byte
@@ -55,13 +63,14 @@ func (b *T) Write64(v uint64, n int) {
 	if n > 64 {
 		panic("64")
 	}
+	b.ensure(n)
 	j := uint(0)
 	var k, o, m uint
 	N := uint(n)
 	for j < N {
 		k, o = b.i/8, b.i%8
 		if o == 0 && j+8 < N {
-			b.D[k] = byte((v >> j) & 0xFF)
+			b.d[k] = byte((v >> j) & 0xFF)
 			j += 8
 			b.i += 8
 			continue
@@ -99,7 +108,7 @@ func (b *T) Read64(n int) uint64 {
 	for j < N {
 		k, o = b.i/8, b.i%8
 		if o == 0 && j+8 < N {
-			res |= uint64(b.D[k]) << j
+			res |= uint64(b.d[k]) << j
 			j += 8
 			b.i += 8
 			continue
@@ -118,10 +127,11 @@ func (b *T) WriteBits(d byte, n int) {
 	if n > 8 {
 		panic("8")
 	}
+	b.ensure(n)
 	N := uint(n)
 	d &= (1 << N) - 1 // sanitize
 	k, off := b.i/8, b.i%8
-	b.D[k] |= d << off
+	b.d[k] |= d << off
 	if off+N <= 8 {
 		b.i += N
 		return
@@ -136,7 +146,7 @@ func (b *T) ReadBits(n int) byte {
 	}
 	N := uint(n)
 	k, off := b.i/8, b.i%8
-	res := b.D[k] >> off
+	res := b.d[k] >> off
 	m := 8 - off
 	if m == N {
 		b.i += m
@@ -151,23 +161,25 @@ func (b *T) ReadBits(n int) byte {
 }
 
 func (b *T) ReadBit() byte {
+	b.ensure(0)
 	i := b.i
 	b.i++
 	j, o := i/8, i%8
-	if (b.D[j]>>o)&1 == 1 {
+	if (b.d[j]>>o)&1 == 1 {
 		return 1
 	}
 	return 0
 }
 
 func (b *T) WriteBit(d byte) {
+	b.ensure(1)
 	if d == 0 {
 		b.i++
 		return
 	}
 	i := b.i
 	j, o := i/8, i%8
-	b.D[j] |= (1 << o)
+	b.d[j] |= (1 << o)
 	b.i++
 }
 
@@ -181,4 +193,14 @@ func (b *T) WriteBool(v bool) {
 
 func (b *T) ReadBool() bool {
 	return b.ReadBit() == 1
+}
+
+func (b *T) ensure(n int) {
+	j := int(b.i) + n
+	k := j / 8
+	if k >= len(b.d) {
+		tmp := make([]byte, len(b.d)*2)
+		copy(tmp, b.d)
+		b.d = tmp
+	}
 }

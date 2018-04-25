@@ -17,7 +17,7 @@ func TestBBLen(t *testing.T) {
 		d[i] = n
 		b.Write64(n, s)
 	}
-	c := FromSlice(b.D)
+	c := FromSlice(b.d)
 	for i := 0; i < N; i++ {
 		v := c.Read64(shifts[i])
 		if v != d[i] {
@@ -38,7 +38,7 @@ func TestRWBits(t *testing.T) {
 	n := 0
 	src, dst := FromSlice(buf), FromSlice(fub)
 	for n < N*8 {
-		j := rand.Intn(8)
+		j := rand.Intn(9)
 		if n+j > N*8 {
 			j = N*8 - n
 		}
