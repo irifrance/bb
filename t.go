@@ -28,6 +28,10 @@ func (b *T) ByteLen() int {
 	return int(b.i/8 + 1)
 }
 
+func (b *T) BitLen() int {
+	return int(b.i)
+}
+
 func (b *T) Rewind() {
 	b.i = 0
 }
@@ -60,7 +64,46 @@ func (b *T) WriteLen(v uint64, n int) {
 	}
 }
 
+func (b *T) WriteBits(d byte, n int) {
+	if n > 8 {
+		panic("8")
+	}
+	N := uint(n)
+	d &= (1 << N) - 1 // sanitize
+	k, off := b.i/8, b.i%8
+	b.D[k] |= d << off
+	if off+N <= 8 {
+		b.i += N
+		return
+	}
+	b.i += 8 - off
+	b.WriteBits(d>>(8-off), int((off+N)-8))
+}
+
+func (b *T) ReadBits(n int) byte {
+	if n > 8 {
+		panic("8")
+	}
+	N := uint(n)
+	k, off := b.i/8, b.i%8
+	res := b.D[k] >> off
+	m := 8 - off
+	if m == N {
+		b.i += m
+		return res
+	}
+	if m < N {
+		b.i += m
+		return res | (b.ReadBits(int(N-m)) << m)
+	}
+	b.i += N
+	return res & ((1 << N) - 1)
+}
+
 func (b *T) ReadLen(n int) uint64 {
+	if n > 64 {
+		panic("64")
+	}
 	res := uint64(0)
 	j := uint(0)
 	N := uint(n)
@@ -97,17 +140,4 @@ func (b *T) WriteBit(d byte) {
 	j, o := i/8, i%8
 	b.D[j] |= (1 << o)
 	b.i++
-}
-
-func (b *T) ReadBits(n int) byte {
-	if n > 8 {
-		panic("8")
-	}
-	return 0
-}
-
-func (b *T) WriteBits(d byte, n int) {
-	if n > 8 {
-		panic("8")
-	}
 }
