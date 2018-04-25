@@ -13,6 +13,7 @@ func New(sz int) *T {
 	return &T{D: make([]byte, sz)}
 }
 
+// Bump if bit index is not aligned to next byte
 func (b *T) Bump() {
 	m := b.i % 8
 	if m != 0 {
