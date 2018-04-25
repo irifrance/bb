@@ -36,32 +36,53 @@ func (b *T) Rewind() {
 	b.i = 0
 }
 
-func (b *T) WriteBool(v bool) {
-	if v {
-		b.WriteBit(1)
-	} else {
-		b.WriteBit(0)
-	}
-}
-
-func (b *T) ReadBool() bool {
-	return b.ReadBit() == 1
-}
-
 func (b *T) WriteLen(v uint64, n int) {
+	if n > 64 {
+		panic("64")
+	}
 	j := uint(0)
+	var k, o, m uint
 	N := uint(n)
 	for j < N {
-		k, o := b.i/8, b.i%8
+		k, o = b.i/8, b.i%8
 		if o == 0 && j+8 < N {
 			b.D[k] = byte((v >> j) & 0xFF)
 			j += 8
 			b.i += 8
 			continue
 		}
-		b.WriteBool((v>>j)&1 != 0)
-		j++
+		m = 8 - o
+		if j+m > N {
+			m = N - j
+		}
+		b.WriteBits(byte(v>>j), int(m))
+		j += m
 	}
+}
+
+func (b *T) ReadLen(n int) uint64 {
+	if n > 64 {
+		panic("64")
+	}
+	res := uint64(0)
+	var j, k, o, m uint
+	N := uint(n)
+	for j < N {
+		k, o = b.i/8, b.i%8
+		if o == 0 && j+8 < N {
+			res |= uint64(b.D[k]) << j
+			j += 8
+			b.i += 8
+			continue
+		}
+		m = 8 - o
+		if j+m > N {
+			m = N - j
+		}
+		res |= uint64(b.ReadBits(int(m))) << j
+		j += m
+	}
+	return res
 }
 
 func (b *T) WriteBits(d byte, n int) {
@@ -100,27 +121,6 @@ func (b *T) ReadBits(n int) byte {
 	return res & ((1 << N) - 1)
 }
 
-func (b *T) ReadLen(n int) uint64 {
-	if n > 64 {
-		panic("64")
-	}
-	res := uint64(0)
-	j := uint(0)
-	N := uint(n)
-	for j < N {
-		k, o := b.i/8, b.i%8
-		if o == 0 && j+8 < N {
-			res |= uint64(b.D[k]) << j
-			j += 8
-			b.i += 8
-			continue
-		}
-		res |= uint64(b.ReadBit()) << j
-		j++
-	}
-	return res
-}
-
 func (b *T) ReadBit() byte {
 	i := b.i
 	b.i++
@@ -140,4 +140,16 @@ func (b *T) WriteBit(d byte) {
 	j, o := i/8, i%8
 	b.D[j] |= (1 << o)
 	b.i++
+}
+
+func (b *T) WriteBool(v bool) {
+	if v {
+		b.WriteBit(1)
+	} else {
+		b.WriteBit(0)
+	}
+}
+
+func (b *T) ReadBool() bool {
+	return b.ReadBit() == 1
 }
