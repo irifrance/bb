@@ -69,6 +69,17 @@ func (b *T) Rewind() {
 	b.i = 0
 }
 
+// SeekBit seeks to the i'th bit.  i must be in the range
+// [0..b.BitCap()] (inclusive).  The final bit is allowed
+// for seek-then write operations.  Seek to end then read
+// will panic on read.
+func (b *T) SeekBit(i int) {
+	if i < 0 || i > len(b.d)*8 {
+		panic("out of bounds")
+	}
+	b.i = uint(i)
+}
+
 func (b *T) Write32(v uint32, n int) {
 	if n > 32 {
 		panic("32")
