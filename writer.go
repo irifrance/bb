@@ -1,6 +1,8 @@
 package bb
 
-import "io"
+import (
+	"io"
+)
 
 type Writer struct {
 	t *T
@@ -13,7 +15,7 @@ func (w *Writer) Bump() {
 }
 
 func (w *Writer) WriteBit(b byte) error {
-	if !w.t.has(1) && !w.swap(1) {
+	if !w.t.has(1) && !w.swap() {
 		return w.err
 	}
 	w.t.WriteBit(b)
@@ -21,7 +23,7 @@ func (w *Writer) WriteBit(b byte) error {
 }
 
 func (w *Writer) WriteBool(b bool) error {
-	if !w.t.has(1) && !w.swap(1) {
+	if !w.t.has(1) && !w.swap() {
 		return w.err
 	}
 	w.t.WriteBool(b)
@@ -32,7 +34,7 @@ func (w *Writer) WriteBits(b byte, n int) error {
 	if n > 8 {
 		return OutOfBounds
 	}
-	if !w.t.has(n) && !w.swap(n) {
+	if !w.t.has(n) && !w.swap() {
 		return w.err
 	}
 	w.t.WriteBits(b, n)
@@ -44,7 +46,7 @@ func (w *Writer) Write16(v uint16, n int) error {
 		return OutOfBounds
 	}
 	t := w.t
-	if !t.has(n) && !w.swap(n) {
+	if !t.has(n) && !w.swap() {
 		return w.err
 	}
 	t.Write16(v, n)
@@ -56,7 +58,7 @@ func (w *Writer) Write32(v uint32, n int) error {
 		return OutOfBounds
 	}
 	t := w.t
-	if !t.has(n) && !w.swap(n) {
+	if !t.has(n) && !w.swap() {
 		return w.err
 	}
 	t.Write32(v, n)
@@ -68,29 +70,31 @@ func (w *Writer) Write64(v uint64, n int) error {
 		return OutOfBounds
 	}
 	t := w.t
-	if !t.has(n) && !w.swap(n) {
+	if !t.has(n) && !w.swap() {
 		return w.err
 	}
 	t.Write64(v, n)
 	return nil
 }
 
-func (w *Writer) swap(n int) bool {
+func (w *Writer) Flush() error {
+	w.Bump()
+	w.swap()
+	return w.err
+}
+
+func (w *Writer) swap() bool {
 	t := w.t
 	p, m := int(t.i/8), t.i%8
 	t.i = m
-	nw := 0
-	for nw < p {
-		m, e := w.Write(t.d[:p])
-		if e != nil {
-			w.err = e
-			return false
-		}
-		nw += m
+	nw, e := w.Write(t.d[:p])
+	if e != nil {
+		w.err = e
+		return false
+	}
+	if nw != p {
+		panic("nw")
 	}
 	t.d[0] = t.d[p]
-	for i := 1; i < len(t.d); i++ {
-		t.d[i] = 0
-	}
 	return true
 }

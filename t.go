@@ -1,6 +1,8 @@
 package bb
 
-import "io"
+import (
+	"io"
+)
 
 type T struct {
 	d []byte
@@ -57,6 +59,10 @@ func (b *T) ByteLen() int {
 
 func (b *T) BitLen() int {
 	return int(b.i)
+}
+
+func (b *T) BitsRemaining() int {
+	return len(b.d)*8 - int(b.i)
 }
 
 func (b *T) Rewind() {
@@ -179,7 +185,6 @@ func (b *T) ReadBits(n int) byte {
 }
 
 func (b *T) ReadBit() byte {
-	b.ensure(0)
 	i := b.i
 	b.i++
 	j, o := i/8, i%8

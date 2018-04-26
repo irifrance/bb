@@ -1,7 +1,6 @@
 package bb
 
 import (
-	"fmt"
 	"io"
 )
 
@@ -26,7 +25,7 @@ func (r *Reader) ReadBool() (bool, error) {
 	if !r.t.has(1) && !r.swap(1) {
 		return false, r.err
 	}
-	return r.t.ReadBit() == 1, nil
+	return r.t.ReadBool(), nil
 }
 
 func (r *Reader) ReadBits(n int) (byte, error) {
@@ -74,14 +73,15 @@ func (r *Reader) Read64(n int) (uint64, error) {
 
 func (r *Reader) swap(n int) bool {
 	t := r.t
+	rem := t.BitsRemaining()
 	p, m := int(t.i/8), t.i%8
 	q := len(t.d) - p
 	copy(t.d, t.d[p:])
 	t.i = m
 	nRead, e := r.Read(t.d[q:])
-	fmt.Printf("reader swap read %d preserved %d\n", nRead, q)
 	if e != nil {
 		r.err = e
 	}
-	return nRead >= p
+	t.d = t.d[:q+nRead]
+	return nRead*8+rem >= n
 }

@@ -2,7 +2,6 @@ package bb
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"testing"
 )
@@ -14,7 +13,6 @@ func TestReaderReadBits(t *testing.T) {
 }
 
 func testReadBits(t *testing.T, i int) {
-	fmt.Printf("testing %d\n", i)
 	N := i * 64
 	n := 0
 	ones := false
