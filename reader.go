@@ -9,16 +9,6 @@ type Reader struct {
 	io.Reader
 	err     error
 	srcRead int64
-	trace   *T
-}
-
-func (r *Reader) StartTrace() {
-	r.trace = New(0)
-}
-
-func (r *Reader) EndTrace() []byte {
-	r.trace = nil
-	return nil
 }
 
 func (r *Reader) Bump() {
