@@ -240,7 +240,5 @@ func (b *T) ensure(n int) {
 }
 
 func (b *T) has(n int) bool {
-	j := int(b.i) + n
-	k := j / 8
-	return k < len(b.d)
+	return len(b.d)*8-int(b.i) >= n
 }
