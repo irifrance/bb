@@ -103,8 +103,13 @@ func (w *Writer) swap() bool {
 	if nw != p {
 		panic("nw")
 	}
+	j := 0
 	if p < len(t.d) {
 		t.d[0] = t.d[p]
+		j++
+	}
+	for i := j; i < len(t.d); i++ {
+		t.d[i] = 0
 	}
 	w.nFlush += int64(nw)
 	return true
