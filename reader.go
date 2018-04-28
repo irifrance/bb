@@ -7,7 +7,8 @@ import (
 type Reader struct {
 	t *T
 	io.Reader
-	err error
+	err     error
+	srcRead int64
 }
 
 func (r *Reader) Bump() {
@@ -71,6 +72,10 @@ func (r *Reader) Read64(n int) (uint64, error) {
 	return t.Read64(n), nil
 }
 
+func (r *Reader) BitsRead() int64 {
+	return 8*r.srcRead - int64(r.t.BitsRemaining())
+}
+
 func (r *Reader) swap(n int) bool {
 	t := r.t
 	rem := t.BitsRemaining()
@@ -83,5 +88,6 @@ func (r *Reader) swap(n int) bool {
 		r.err = e
 	}
 	t.d = t.d[:q+nRead]
+	r.srcRead += int64(nRead)
 	return nRead*8+rem >= n
 }

@@ -7,7 +7,8 @@ import (
 type Writer struct {
 	t *T
 	io.Writer
-	err error
+	err    error
+	nFlush int64
 }
 
 func (w *Writer) Bump() {
@@ -16,6 +17,7 @@ func (w *Writer) Bump() {
 
 func (w *Writer) WriteBit(b byte) error {
 	if !w.t.has(1) && !w.swap() {
+
 		return w.err
 	}
 	w.t.WriteBit(b)
@@ -83,11 +85,17 @@ func (w *Writer) Flush() error {
 	return w.err
 }
 
+func (w *Writer) BitsWritten() int64 {
+	return 8*w.nFlush + int64(w.t.i)
+}
+
 func (w *Writer) swap() bool {
 	t := w.t
 	p, m := int(t.i/8), t.i%8
+	var nw int
+	var e error
 	t.i = m
-	nw, e := w.Write(t.d[:p])
+	nw, e = w.Write(t.d[:p])
 	if e != nil {
 		w.err = e
 		return false
@@ -95,6 +103,9 @@ func (w *Writer) swap() bool {
 	if nw != p {
 		panic("nw")
 	}
-	t.d[0] = t.d[p]
+	if p < len(t.d) {
+		t.d[0] = t.d[p]
+	}
+	w.nFlush += int64(nw)
 	return true
 }

@@ -232,7 +232,8 @@ func (b *T) ReadBool() bool {
 func (b *T) ensure(n int) {
 	j := int(b.i) + n
 	k := j / 8
-	if k >= len(b.d) {
+	m := j % 8
+	if k > len(b.d) || (k == len(b.d) && m > 0) {
 		tmp := make([]byte, len(b.d)*2)
 		copy(tmp, b.d)
 		b.d = tmp
