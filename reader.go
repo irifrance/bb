@@ -9,6 +9,16 @@ type Reader struct {
 	io.Reader
 	err     error
 	srcRead int64
+	trace   *T
+}
+
+func (r *Reader) StartTrace() {
+	r.trace = New(0)
+}
+
+func (r *Reader) EndTrace() []byte {
+	r.trace = nil
+	return nil
 }
 
 func (r *Reader) Bump() {
@@ -83,11 +93,19 @@ func (r *Reader) swap(n int) bool {
 	q := len(t.d) - p
 	copy(t.d, t.d[p:])
 	t.i = m
-	nRead, e := r.Read(t.d[q:])
-	if e != nil {
-		r.err = e
+	n, nRead := 0, 0
+	for nRead < p {
+		n, r.err = r.Read(t.d[q:])
+		nRead += n
+		q += n
+		if r.err != nil {
+			break
+		}
 	}
-	t.d = t.d[:q+nRead]
+	t.d = t.d[:q]
 	r.srcRead += int64(nRead)
+	if nRead == 0 && r.err != nil {
+		return false
+	}
 	return nRead*8+rem >= n
 }
