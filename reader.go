@@ -11,6 +11,30 @@ type Reader struct {
 	srcRead int64
 }
 
+func NewReader(r io.Reader, sz int) *Reader {
+	if sz < 8 {
+		sz = 8
+	}
+	t := New(sz)
+	t.i = uint(sz * 8)
+	return &Reader{t: t, Reader: r}
+}
+
+func ReaderFromSlice(r io.Reader, sl []byte) *Reader {
+	if len(sl) < 8 {
+		tmp := make([]byte, 8)
+		copy(tmp, sl)
+		sl = tmp
+	}
+	t := FromSlice(sl)
+	t.i = uint(len(sl) * 8)
+	return &Reader{t: t, Reader: r}
+}
+
+func (r *Reader) T() *T {
+	return r.t
+}
+
 func (r *Reader) Bump() {
 	r.t.Bump()
 }

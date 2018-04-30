@@ -11,6 +11,18 @@ type Writer struct {
 	nFlush int64
 }
 
+func NewWriter(w io.Writer, sz int) *Writer {
+	if sz < 8 {
+		sz = 8
+	}
+	t := New(sz)
+	return &Writer{Writer: w, t: t}
+}
+
+func (w *Writer) T() *T {
+	return w.t
+}
+
 func (w *Writer) Bump() {
 	w.t.Bump()
 }

@@ -8,7 +8,7 @@ import (
 func TestReaderWriter(t *testing.T) {
 	bio := New(10)
 	bub := bytes.NewBuffer(nil)
-	bw, _ := bio.Writer(bub)
+	bw := NewWriter(bub, 16)
 	M := 5
 	N := M * 8
 	n := 0

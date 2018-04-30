@@ -1,9 +1,5 @@
 package bb
 
-import (
-	"io"
-)
-
 type T struct {
 	d []byte
 	i uint
@@ -15,22 +11,6 @@ func FromSlice(d []byte) *T {
 
 func New(sz int) *T {
 	return &T{d: make([]byte, sz)}
-}
-
-func (b *T) Reader(r io.Reader) (*Reader, error) {
-	if len(b.d) < 8 {
-		return nil, BufferTooSmall
-	}
-	b.i = uint(len(b.d)) * 8
-	return &Reader{t: b, Reader: r}, nil
-}
-
-func (b *T) Writer(w io.Writer) (*Writer, error) {
-	if len(b.d) < 8 {
-		return nil, BufferTooSmall
-	}
-	b.i = 0
-	return &Writer{t: b, Writer: w}, nil
 }
 
 func (b *T) Bytes() []byte {

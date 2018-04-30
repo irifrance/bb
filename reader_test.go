@@ -32,8 +32,7 @@ func testRead64(t *testing.T, i int) {
 		n += j % 64
 	}
 	bio.Bump()
-	rbio := New(16)
-	r, _ := rbio.Reader(bytes.NewBuffer(bio.Bytes()))
+	r := NewReader(bytes.NewBuffer(bio.Bytes()), 16)
 	n, j = 0, 0
 	for n < N {
 		v := uint(j % i)
@@ -67,8 +66,7 @@ func testReadBits(t *testing.T, i int) {
 		n++
 	}
 
-	rbio := New(16)
-	r, _ := rbio.Reader(bytes.NewBuffer(bio.Bytes()))
+	r := NewReader(bytes.NewBuffer(bio.Bytes()), 16)
 	n = 0
 	ones = false
 	for n < N {
@@ -95,7 +93,7 @@ func testReadWBits(t *testing.T, i int) {
 	n := 0
 	ones := false
 	var buf bytes.Buffer
-	bio, _ := New(N / 8).Writer(&buf)
+	bio := NewWriter(&buf, 16)
 	for n < N {
 		if ones {
 			bio.WriteBool(true)
@@ -109,8 +107,7 @@ func testReadWBits(t *testing.T, i int) {
 	}
 	bio.Flush()
 
-	rbio := New(16)
-	r, _ := rbio.Reader(bytes.NewBuffer(buf.Bytes()))
+	r := NewReader(bytes.NewBuffer(buf.Bytes()), 16)
 	n = 0
 	ones = false
 	for n < N {
