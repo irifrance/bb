@@ -1,6 +1,8 @@
 package bb
 
 import (
+	"encoding/binary"
+	"fmt"
 	"io"
 )
 
@@ -94,6 +96,49 @@ func (r *Reader) Read64(n int) (uint64, error) {
 		return 0, r.err
 	}
 	return t.Read64(n), nil
+}
+
+func (r *Reader) ReadVarint() (int64, error) {
+	buf, e := r.readV()
+	if e != nil {
+		return 0, e
+	}
+	val, n := binary.Varint(buf)
+	if n <= 0 {
+		return 0, fmt.Errorf("binary.Varint gave %d\n", n)
+	}
+	return val, nil
+}
+
+func (r *Reader) ReadUvarint() (uint64, error) {
+	buf, e := r.readV()
+	if e != nil {
+		return 0, e
+	}
+	val, n := binary.Uvarint(buf)
+	if n <= 0 {
+		return 0, fmt.Errorf("binary.Varint gave %d\n", n)
+	}
+	return val, nil
+}
+
+func (r *Reader) readV() ([]byte, error) {
+	buf := make([]byte, 8)
+	i := 0
+	var b byte
+	var e error
+	for i < 8 {
+		b, e = r.ReadBits(8)
+		if e != nil {
+			return nil, e
+		}
+		buf[i] = b
+		i++
+		if b&128 == 0 {
+			break
+		}
+	}
+	return buf, nil
 }
 
 func (r *Reader) BitsRead() int64 {

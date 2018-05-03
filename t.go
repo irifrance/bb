@@ -206,7 +206,8 @@ func (b *T) WriteBool(v bool) {
 }
 
 func (b *T) ReadBool() bool {
-	return b.ReadBit() == 1
+	v := b.ReadBit() == 1
+	return v
 }
 
 func (b *T) ensure(n int) {

@@ -1,6 +1,7 @@
 package bb
 
 import (
+	"encoding/binary"
 	"io"
 )
 
@@ -88,6 +89,28 @@ func (w *Writer) Write64(v uint64, n int) error {
 		return w.err
 	}
 	t.Write64(v, n)
+	return nil
+}
+
+func (w *Writer) WriteVarint(val int64) error {
+	buf := make([]byte, 8)
+	n := binary.PutVarint(buf, val)
+	for i := 0; i < n; i++ {
+		if e := w.WriteBits(buf[i], 8); e != nil {
+			return e
+		}
+	}
+	return nil
+}
+
+func (w *Writer) WriteUvarint(val uint64) error {
+	buf := make([]byte, 8)
+	n := binary.PutUvarint(buf, val)
+	for i := 0; i < n; i++ {
+		if e := w.WriteBits(buf[i], 8); e != nil {
+			return e
+		}
+	}
 	return nil
 }
 

@@ -15,6 +15,10 @@ func TestReaderReadBits(t *testing.T) {
 	}
 }
 
+func TestReadVarw(t *testing.T) {
+
+}
+
 func testRead64(t *testing.T, i int) {
 	fmt.Printf("tstRead64 %d\n", i)
 	N := i * 128
