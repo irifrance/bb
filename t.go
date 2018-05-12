@@ -1,5 +1,6 @@
 package bb
 
+// T encapsulates io-error-free bit reading/writing to a backing slice
 type T struct {
 	d []byte
 	i uint

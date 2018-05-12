@@ -57,7 +57,7 @@ func testReadBits(t *testing.T, i int) {
 	N := i * 64
 	n := 0
 	ones := false
-	bio := New(N / 8)
+	bio := NewBuffer(N / 8)
 	for n < N {
 		if ones {
 			bio.WriteBool(true)
@@ -70,7 +70,9 @@ func testReadBits(t *testing.T, i int) {
 		n++
 	}
 
-	r := NewReader(bytes.NewBuffer(bio.Bytes()), 16)
+	bio.SeekBit(0)
+	var r Reader
+	r = bio
 	n = 0
 	ones = false
 	for n < N {
@@ -96,8 +98,7 @@ func testReadWBits(t *testing.T, i int) {
 	N := i * 64
 	n := 0
 	ones := false
-	var buf bytes.Buffer
-	bio := NewWriter(&buf, 16)
+	bio := NewBuffer(1)
 	for n < N {
 		if ones {
 			bio.WriteBool(true)
@@ -109,9 +110,11 @@ func testReadWBits(t *testing.T, i int) {
 		}
 		n++
 	}
-	bio.Flush()
+	bio.Bump()
 
-	r := NewReader(bytes.NewBuffer(buf.Bytes()), 16)
+	var r Reader
+	bio.SeekBit(0)
+	r = bio
 	n = 0
 	ones = false
 	for n < N {
@@ -126,9 +129,5 @@ func testReadWBits(t *testing.T, i int) {
 			ones = !ones
 		}
 		n++
-	}
-	_, e := r.ReadBool()
-	if e != io.EOF {
-		t.Errorf("no EOF")
 	}
 }
