@@ -5,6 +5,7 @@ import "io"
 type Writer interface {
 	Bump()
 	WriteBit(b byte) error
+	WriteBool(b bool) error
 	WriteBits(b byte, n int) error
 	Write16(v uint16, n int) error
 	Write32(v uint32, n int) error
