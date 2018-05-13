@@ -1,3 +1,6 @@
+// Copyright 2018 Iri France SAS. All rights reserved.  Use of this source code
+// is governed by a license that can be found in the License file.
+
 package bb
 
 // T encapsulates io-error-free bit reading/writing to a backing slice
