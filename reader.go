@@ -17,6 +17,7 @@ type Reader interface {
 func NewReader(r io.Reader, sz int) Reader {
 	b := NewBuffer(sz)
 	b.r = r
+	b.t.i = uint(sz) * 8
 	return b
 }
 

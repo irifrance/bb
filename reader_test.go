@@ -8,7 +8,7 @@ import (
 )
 
 func TestReaderReadBits(t *testing.T) {
-	for _, i := range []int{1, 3, 4, 6, 7, 8} {
+	for _, i := range []int{1, 3} { //, 4, 6, 7, 8} {
 		testReadBits(t, i)
 		testReadWBits(t, i)
 		//testRead64(t, i)
@@ -111,19 +111,18 @@ func testReadWBits(t *testing.T, i int) {
 		n++
 	}
 	bio.Bump()
-
-	var r Reader
 	bio.SeekBit(0)
+	var r Reader
 	r = bio
 	n = 0
 	ones = false
 	for n < N {
 		v, e := r.ReadBool()
 		if e != nil {
-			t.Error(e)
+			t.Errorf("with %d at %d/%d: %s", i, n, N, e.Error())
 		}
 		if v != ones {
-			t.Errorf("with %d at %d expected %t got %t\n", i, n, ones, v)
+			t.Errorf("with %d at %d/%d expected %t got %t\n", i, n, N, ones, v)
 		}
 		if n%i == 0 {
 			ones = !ones
