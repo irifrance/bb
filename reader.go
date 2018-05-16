@@ -23,7 +23,3 @@ func NewReader(r io.Reader, sz int) Reader {
 	b.t.i = uint(sz) * 8
 	return b
 }
-
-func NewBufferReader(sz int) Reader {
-	return NewBuffer(sz)
-}

@@ -24,8 +24,3 @@ func NewWriter(w io.Writer, sz int) Writer {
 	b.w = w
 	return b
 }
-
-func NewWriterBuffer(sz int) Writer {
-	b := NewBuffer(sz)
-	return b
-}
