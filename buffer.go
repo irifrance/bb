@@ -132,11 +132,15 @@ func (bb *Buffer) readV() ([]byte, error) {
 }
 
 func (b *Buffer) BitsRead() int64 {
-	return int64(b.t.BitLen())
+	return b.srcRead + int64(b.t.BitLen())
 }
 
 func (b *Buffer) SeekBit(i int) {
 	b.t.SeekBit(i)
+}
+
+func (b *Buffer) Bytes() []byte {
+	return b.t.Bytes()
 }
 
 func (bb *Buffer) WriteBit(b byte) error {
@@ -232,7 +236,7 @@ func (b *Buffer) Flush() error {
 }
 
 func (b *Buffer) BitsWritten() int64 {
-	return int64(b.t.i)
+	return b.nFlush + int64(b.t.i)
 }
 
 func (b *Buffer) rSwap(n int) bool {
