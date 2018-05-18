@@ -6,6 +6,7 @@ package bb
 import "io"
 
 type Reader interface {
+	BitsRead() int64
 	Bump()
 	ReadBit() (byte, error)
 	ReadBool() (bool, error)
