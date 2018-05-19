@@ -11,6 +11,7 @@ type Reader interface {
 	ReadBit() (byte, error)
 	ReadBool() (bool, error)
 	ReadBits(n int) (byte, error)
+	ReadByte() (byte, error)
 	Read16(n int) (uint16, error)
 	Read32(n int) (uint32, error)
 	Read64(n int) (uint64, error)

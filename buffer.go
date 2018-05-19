@@ -52,6 +52,10 @@ func (b *Buffer) ReadBits(n int) (byte, error) {
 	return b.t.ReadBits(n), nil
 }
 
+func (b *Buffer) ReadByte() (byte, error) {
+	return b.ReadBits(8)
+}
+
 func (b *Buffer) Read16(n int) (uint16, error) {
 	if n > 16 {
 		return 0, OutOfBounds
@@ -169,6 +173,10 @@ func (bb *Buffer) WriteBits(b byte, n int) error {
 	}
 	bb.t.WriteBits(b, n)
 	return nil
+}
+
+func (bb *Buffer) WriteByte(b byte) error {
+	return bb.WriteBits(b, 8)
 }
 
 func (b *Buffer) Write16(v uint16, n int) error {

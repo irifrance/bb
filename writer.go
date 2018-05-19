@@ -10,6 +10,7 @@ type Writer interface {
 	WriteBit(b byte) error
 	WriteBool(b bool) error
 	WriteBits(b byte, n int) error
+	WriteByte(b byte) error
 	Write16(v uint16, n int) error
 	Write32(v uint32, n int) error
 	Write64(v uint64, n int) error
