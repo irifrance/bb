@@ -136,7 +136,7 @@ func (bb *Buffer) readV() ([]byte, error) {
 }
 
 func (b *Buffer) BitsRead() int64 {
-	return b.srcRead*8 + int64(b.t.BitLen())
+	return b.srcRead*8 + int64(b.t.BitLen()) - int64(b.t.BitCap()-b.t.BitLen())
 }
 
 func (b *Buffer) SeekBit(i int) {

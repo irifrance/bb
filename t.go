@@ -45,6 +45,10 @@ func (b *T) BitLen() int {
 	return int(b.i)
 }
 
+func (b *T) BitCap() int {
+	return len(b.d) * 8
+}
+
 func (b *T) BitsRemaining() int {
 	return len(b.d)*8 - int(b.i)
 }
