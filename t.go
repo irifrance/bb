@@ -201,7 +201,11 @@ func (b *T) WriteBit(d byte) {
 	}
 	i := b.i
 	j, o := i/8, i%8
-	b.d[j] |= (1 << o)
+	if d != 0 {
+		b.d[j] |= (1 << o)
+	} else {
+		b.d[j] &= ^(1 << o)
+	}
 	b.i++
 }
 
