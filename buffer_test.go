@@ -35,3 +35,13 @@ func TestBackedBuffer(t *testing.T) {
 		t.Errorf("expected EOF")
 	}
 }
+
+func TestLens(t *testing.T) {
+	bb := bytes.NewBuffer(nil)
+	bb.WriteByte(0)
+	r := NewReader(bb, 4096)
+	r.ReadByte()
+	if r.BitsRead() != 8 {
+		t.Errorf("bits read got %d not 8\n", r.BitsRead())
+	}
+}
